@@ -17,13 +17,24 @@ Order = namedtuple('Order', 'id, items')
 Item = namedtuple('Item', 'type, description, amount, quantity')
 
 def validorder(order: Order):
+    if not isinstance(order.items, (list, tuple)):
+        return "Invalid order: items must be a list or tuple"
+
     net = 0
 
     for item in order.items:
+        if not isinstance(item, Item):
+            return "Invalid order: all items must be of type Item"
+        try:
+            amount = float(item.amount)
+            quantity = int(item.quantity)
+        except ValueError:
+            return "Invalid item values in order ID: %s" % order.id
+
         if item.type == 'payment':
-            net += item.amount
+            net += amount
         elif item.type == 'product':
-            net -= item.amount * item.quantity
+            net -= amount * quantity
         else:
             return "Invalid item type: %s" % item.type
 
